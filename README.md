@@ -1,1 +1,3 @@
-# DSCI_575_project_yzzx01_rnliang
+# Information Retrieval with BM25 and Embeddings
+
+Authors: Yasaman Baher, Jessie Liang
