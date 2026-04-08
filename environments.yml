@@ -56,3 +56,4 @@ dependencies:
     - langchain-mcp-adapters
     - langchain-text-splitters
     - pypdf
+    - rank-bm25 
