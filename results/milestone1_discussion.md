@@ -147,3 +147,21 @@
 3)  Embedding search at least has one very relevant result: a game that can be learned "in 5 minutes". However, not all of the returned results are highly relevant. Some random/confusing results still exist.
 
 4)  In summary, embedding search results are partly useful, while BM25 is not useful at all. For complex queries like this, some more advanced or combined algorithms are worth trying to gain more satisfactory outcomes.
+
+# 4.4 Summarize Insights
+
+-   What are the strengths and weaknesses of each method?
+
+1.  BM25: It does well in matching exact keywords from the structured text, with fast and cheap computation. However, it does not understand the semantic meaning of the text at all, therefore having difficulty in retrieving items whose text includes paraphrases or synonyms.
+
+2.  Embedding search: It is good at understanding the semantic meaning of the text, which deals with paraphrasing and natural language well. Nevertheless, exact keywords might not be captured. Seemingly correct but indeed irrelevant results might be returned as top choices. Additionally, it requires much more computational resources than BM25.
+
+-   What types of queries are challenging for both methods?
+
+1.  Abstract, high-level and complex queries are challenging for both methods. These queries cannot be simply understood by keyword matching or semantic wording. Instead, it might involve advanced knowledge of a domain which is not doable for these 2 relatively simple methods.
+
+2.  When the target items described by the queries rarely appear in the data source, neither algorithm can perform well, since the answers are out of the scope.
+
+-   Where might more advanced methods (e.g., RAG or reranking) help?
+
+More advanced methods can shine in these cases: unstructured long text and/or complex queries with multiple intents. It can also pool strength from individual methods, especially when several simple methods cannot do well on their own, and the combination of several methods' strengths can yield ideal results.
