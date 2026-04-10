@@ -16,6 +16,13 @@ This project uses a large-scale Amazon Reviews dataset collected by McAuley Lab 
 - `review`: This consists of user reviews such as rating, helpfulness votes, etc.
 - `meta`: This is the item metadata file including the description, price, etc of the item itself.
 
+## Data Processing description
+- Limit the size of raw data files so that they only include 10,000 rows
+- Filtering: only keep the reviews where `verified_purchase == True`, and only the products that appear on both the `review` and `meta` dataset
+- Column selection: drop 'videos', 'price', 'images', 'bought_together', 'subtitle', 'author' columns from `meta`, and drop 'images', 'timestamp', 'user_id', 'verified_purchase' from `review`
+- Combine useful columns from `meta` into one single string for each product, including information of 'title', 'average_rating', 'description', 'features', 'categories', etc
+- For nested fields: join lists into strings, concatenate key-value pairs of dictionary, handle missing strings by replacing with the empty string, etc
+
 ## How to run the app locally
 - Change the working directory to the root project directory
 - Run the following command in terminal:
