@@ -1,0 +1,143 @@
+# interactive app
+
+import pandas as pd
+import numpy as np
+from rank_bm25 import BM25Okapi
+from langchain_community.retrievers import BM25Retriever
+from sklearn.metrics.pairwise import cosine_similarity
+from sentence_transformers import SentenceTransformer
+import re
+import pickle
+from langchain_openai import OpenAIEmbeddings
+import faiss
+import dash
+from dash import dcc, html, Input, Output, State, Dash
+import dash_bootstrap_components as dbc
+
+
+meta = pd.read_json("data/raw/meta_Toys_and_Games.jsonl", lines = True, nrows=10000)
+review = pd.read_json("data/raw/Toys_and_Games.jsonl", lines = True, nrows=10000)
+
+cleaned_meta = meta.drop(columns = ['videos', 'price', 'images', 'bought_together', 'subtitle', 'author'])
+reviews = review[review['verified_purchase'] == True]
+cleaned_reviews = reviews.drop(columns = ['images', 'timestamp', 'user_id', 'verified_purchase'])
+parent_asin = list(pd.Series(np.intersect1d(cleaned_reviews['parent_asin'], cleaned_meta['parent_asin'])))
+cleaned_reviews = cleaned_reviews[cleaned_reviews['parent_asin'].isin(parent_asin)]
+cleaned_meta = cleaned_meta[cleaned_meta['parent_asin'].isin(parent_asin)]
+cleaned_meta['description'] = cleaned_meta['description'].apply(
+    lambda x: " ".join(x) if isinstance(x, list) else (x if isinstance(x, str) else "")
+)
+cleaned_meta['details'] = cleaned_meta['details'].apply(
+    lambda x: " ".join([f"{k} {v}" for k, v in x.items()]) if isinstance(x, dict) else ""
+)
+cleaned_meta['features'] = cleaned_meta['features'].apply(
+    lambda x: " ".join(x) if isinstance(x, list) else ""
+)
+cleaned_meta['categories'] = cleaned_meta['categories'].apply(
+    lambda x: " ".join(x) if isinstance(x, list) else ""
+)
+
+# code adapted from lecture 5
+
+# combining all the important and useful columns from the meta dataset
+products = (
+    cleaned_meta['title'].fillna('') + ' ' +
+    cleaned_meta['description'].fillna('') + ' ' +
+    cleaned_meta['features'].fillna('') + ' ' +
+    cleaned_meta['categories'].fillna('')
+)
+products = products.tolist()
+queries = cleaned_reviews['title'].tolist()
+
+def simple_tokenize(text):
+    text = text.lower()
+    text = re.sub(r"[^a-z0-9\s-]", "", text)
+    return text.split()
+
+tokenized_products = [simple_tokenize(p) for p in products]
+bm25 = BM25Okapi(tokenized_products)
+
+model = SentenceTransformer("all-MiniLM-L6-v2")
+product_embeddings = model.encode(products).astype("float32")
+
+# using faiss to index product embeddings for semantic search
+index = faiss.IndexFlatL2(product_embeddings.shape[1])
+index.add(product_embeddings)
+
+def bm25_search(query, top_k=3):
+    tokenized_query = simple_tokenize(query)
+    scores = bm25.get_scores(tokenized_query)
+    ranked_idx = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:top_k]
+    return [(products[i], scores[i]) for i in ranked_idx]
+
+def embedding_search(query, top_k=3):
+    query_embedding = model.encode([query]).astype("float32")
+    distances, indices = index.search(query_embedding, top_k)
+    return [(products[i], distances[0][rank]) for rank, i in enumerate(indices[0])]
+
+# building the app
+app = Dash(__name__)
+ 
+app.layout = dbc.Container([
+ 
+    html.H2("Toys & Games Retrieval Models", className="mt-4 mb-1 text-center"),
+ 
+    dbc.Row([
+        dbc.Col([
+            dbc.Label("Search Model"),
+            dbc.RadioItems(
+                id="search-mode",
+                options=[
+                    {"label": "BM25", "value": "bm25"},
+                    {"label": "Embedding Search", "value": "semantic"},
+                ],
+                value="bm25",
+                inline=True,
+                className="mb-2",
+            ),
+            dbc.InputGroup([
+                dbc.Input(
+                    id="query-input",
+                    type="text",
+                    debounce=False,
+                ),
+                dbc.Button("Retrieve", id="search-btn", color="primary", n_clicks=0),
+            ]),
+        ], md=8, className="mx-auto"),
+    ], className="mb-4"),
+ 
+    dbc.Row([
+        dbc.Col(html.Div(id="results-container"), md=10, className="mx-auto"),
+    ]),
+ 
+], fluid=True)
+ 
+
+@app.callback(
+    Output("results-container", "children"),
+    Input("search-btn", "n_clicks"),
+    Input("query-input", "n_submit"),
+    State("query-input", "value"),
+    State("search-mode", "value"),
+    prevent_initial_call=True,
+)
+def retrieve(n_clicks, n_submit, query, mode):
+    if not query or not query.strip():
+        return dbc.Alert("Please enter a search query.", color="warning")
+ 
+    results = bm25_search(query) if mode == "bm25" else embedding_search(query)
+
+    cards = dbc.Card([
+        results
+    ])
+ 
+    header = html.P(
+        f'Top 3 results for "{query}" '
+        f'using {"BM25" if mode == "bm25" else "Embedding"} Search',
+        className="text-muted mb-3"
+    )
+    return [header, cards]
+ 
+
+if __name__ == "__main__":
+    app.run(jupyter_mode="external")
