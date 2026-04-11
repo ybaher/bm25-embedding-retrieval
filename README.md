@@ -50,7 +50,7 @@ This project uses a large-scale Amazon Reviews dataset collected by McAuley Lab 
 -   Run the following command in terminal:
 
 ```{bash}
-python app/app.py
+python -m app.app
 ```
 
 -   Then there will be some outputs in the terminal similar to this:
