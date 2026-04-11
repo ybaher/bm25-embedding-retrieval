@@ -9,7 +9,7 @@ Authors: Yasaman Baher, Jessie Liang
 -   Run the following command in terminal:
 
 ```{bash}
-conda env create -f environment.yml
+conda env create -f environments.yml
 ```
 
 ## Dataset description
