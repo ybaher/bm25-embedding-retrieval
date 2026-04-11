@@ -14,7 +14,11 @@ conda env create -f environment.yml
 
 ## Dataset description
 
-This project uses a large-scale Amazon Reviews dataset collected by McAuley Lab in 2023. Among all 33 product categories, the category selected for this project was `Toys_and_Games`. The size of the data files can be as large as 800M+. There are 2 main component of the dataset: `review` and `meta`: - `review`: This consists of user reviews such as rating, helpfulness votes, etc. - `meta`: This is the item metadata file including the description, price, etc of the item itself.
+This project uses a large-scale Amazon Reviews dataset collected by McAuley Lab in 2023. Among all 33 product categories, the category selected for this project was `Toys_and_Games`. The size of the data files can be as large as 800M+. There are 2 main component of the dataset: `review` and `meta`: 
+
+- `review`: This consists of user reviews such as rating, helpfulness votes, etc.
+
+- `meta`: This is the item metadata file including the description, price, etc of the item itself.
 
 ## Data Processing description
 
