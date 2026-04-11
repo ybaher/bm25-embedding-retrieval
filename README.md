@@ -26,6 +26,20 @@ This project uses a large-scale Amazon Reviews dataset collected by McAuley Lab 
 -   Combine useful columns from `meta` into one single string for each product, including information of 'title', 'average_rating', 'description', 'features', 'categories', etc
 -   For nested fields: join lists into strings, concatenate key-value pairs of dictionary, handle missing strings by replacing with the empty string, etc
 
+## Retrieval workflows
+
+- 'BM25'
+1. Preprocess the input query by tokenizing it
+2. Calculate BM25 scores for every tokenized product
+3. Order products by BM25 score from highest to lowest
+4. Return top k results
+
+- `Embedding Search`
+1. Preprocess the input query using `SentenceTransformer`
+2. Search FAISS index of embedded products by leveraging L2 distance
+3. Order products using L2 distances from lowest to highest
+4. Return top k results
+
 ## How to run the app locally
 
 -   Change the working directory to the root project directory
