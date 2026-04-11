@@ -35,6 +35,8 @@ dependencies:
   - python-graphviz
   - pygraphviz
   - pydot
+  - dash-bootstrap-components
+  - dash
   - pip
   - pip:
     - torch-summary
@@ -57,3 +59,4 @@ dependencies:
     - langchain-text-splitters
     - pypdf
     - rank-bm25 
+    - sentence-transformers
