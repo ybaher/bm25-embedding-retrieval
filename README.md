@@ -32,7 +32,7 @@ This project uses a large-scale Amazon Reviews dataset collected by McAuley Lab 
 
 ## Retrieval workflows
 
-- 'BM25'
+- `BM25`
 1. Preprocess the input query by tokenizing it
 2. Calculate BM25 scores for every tokenized product
 3. Order products by BM25 score from highest to lowest
