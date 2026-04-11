@@ -15,6 +15,11 @@ import dash_bootstrap_components as dbc
 import os
 import logging
 from transformers import logging as hf_logging
+from src.bm25 import bm25_search
+from src.semantic import embedding_search
+from src.simple_tokenize import simple_tokenize
+
+
 
 # suppress warnings
 os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
@@ -58,11 +63,6 @@ products = (
 products = products.tolist()
 queries = cleaned_reviews['title'].tolist()
 
-def simple_tokenize(text):
-    text = text.lower()
-    text = re.sub(r"[^a-z0-9\s-]", "", text)
-    return text.split()
-
 tokenized_products = [simple_tokenize(p) for p in products]
 bm25 = BM25Okapi(tokenized_products)
 
@@ -72,17 +72,6 @@ product_embeddings = model.encode(products).astype("float32")
 # using faiss to index product embeddings for semantic search
 index = faiss.IndexFlatL2(product_embeddings.shape[1])
 index.add(product_embeddings)
-
-def bm25_search(query, top_k=3):
-    tokenized_query = simple_tokenize(query)
-    scores = bm25.get_scores(tokenized_query)
-    ranked_idx = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:top_k]
-    return [(products[i], scores[i]) for i in ranked_idx]
-
-def embedding_search(query, top_k=3):
-    query_embedding = model.encode([query]).astype("float32")
-    distances, indices = index.search(query_embedding, top_k)
-    return [(products[i], distances[0][rank]) for rank, i in enumerate(indices[0])]
 
 # building the app
 app = Dash(__name__)
@@ -134,7 +123,7 @@ def retrieve(n_clicks, n_submit, query, mode):
     if not query or not query.strip():
         return dbc.Alert("Please enter a search query.", color="warning")
  
-    results = bm25_search(query) if mode == "bm25" else embedding_search(query)
+    results = bm25_search(bm25, products, query) if mode == "bm25" else embedding_search(model, index, products, query)
     reviews = []
     for rank, (product, score) in enumerate(results, start=1):
         title = re.search(r"TITLE:\s*(.*?)\s*\|", product)
