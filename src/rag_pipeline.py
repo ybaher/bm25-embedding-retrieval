@@ -9,44 +9,43 @@ from langchain_core.output_parsers import StrOutputParser
 # -------------------------
 # Load data
 # -------------------------
-meta = pd.read_json("data/raw/meta_Toys_and_Games.jsonl", lines = True, nrows=10000)
-review = pd.read_json("data/raw/Toys_and_Games.jsonl", lines = True, nrows=10000)
+meta = pd.read_json("data/raw/meta_Toys_and_Games.jsonl", lines=True, nrows=50000)
+review = pd.read_json("data/raw/Toys_and_Games.jsonl", lines=True, nrows=50000)
 
-cleaned_meta = meta.drop(columns = ['videos', 'price', 'images', 'bought_together', 'subtitle', 'author'])
+cleaned_meta = meta.drop(columns=['videos', 'price', 'images', 'bought_together', 'subtitle', 'author'], errors='ignore')
 cleaned_meta.head()
 
 reviews = review[review['verified_purchase'] == True]
-cleaned_reviews = reviews.drop(columns = ['images', 'timestamp', 'user_id', 'verified_purchase'])
+cleaned_reviews = reviews.drop(columns=['images', 'timestamp', 'user_id', 'verified_purchase'], errors='ignore')
 cleaned_reviews.head()
-
 
 # -------------------------
 # Clean text columns
 # -------------------------
 cleaned_meta['description'] = cleaned_meta['description'].apply(
     lambda x: " ".join(x) if isinstance(x, list) else (x if isinstance(x, str) else "")
-)
+).str.lower()
 
 cleaned_meta['details'] = cleaned_meta['details'].apply(
     lambda x: " ".join([f"{k} {v}" for k, v in x.items()]) if isinstance(x, dict) else ""
-)
+).str.lower()
 
 cleaned_meta['features'] = cleaned_meta['features'].apply(
     lambda x: " ".join(x) if isinstance(x, list) else ""
-)
+).str.lower()
 
 cleaned_meta['categories'] = cleaned_meta['categories'].apply(
     lambda x: " ".join(x) if isinstance(x, list) else ""
-)
+).str.lower()
 
-cleaned_meta = cleaned_meta.reset_index(drop=True)
+cleaned_meta['title'] = cleaned_meta['title'].str.lower()
 
 cleaned_meta = cleaned_meta[
     (cleaned_meta['title'].str.strip() != '') &
     (cleaned_meta['description'].str.strip() != '') &
     (cleaned_meta['features'].str.strip() != '') &
     (cleaned_meta['categories'].str.strip() != '')
-]
+].reset_index(drop=True)
 
 # -------------------------
 # Prepare review text per product
@@ -54,6 +53,7 @@ cleaned_meta = cleaned_meta[
 cleaned_reviews = cleaned_reviews.copy()
 review_text_cols = [col for col in ['title', 'text'] if col in cleaned_reviews.columns]
 cleaned_reviews['combined_review_text'] = cleaned_reviews[review_text_cols].fillna('').agg(' '.join, axis=1)
+cleaned_reviews['combined_review_text'] = cleaned_reviews['combined_review_text'].str.lower()
 
 grouped_reviews = (
     cleaned_reviews.groupby('parent_asin')['combined_review_text']
