@@ -22,7 +22,7 @@ This project uses a large-scale Amazon Reviews dataset collected by McAuley Lab 
 
 ## Data Processing description
 
--   **Size limit:** We limited the size of raw data files so that they only include 10,000 rows
+-   **Size limit:** We limited the size of raw data files so that they only include 50,000 rows
     -   Note that our team tried to convert both `meta_Toys_and_Games.jsonl` and `Toys_and_Games.jsonl` from jsonl to parquet, however, due to the large size of the files, our local machines were not able to handle loading the full dataset into memory without slowing down or crashing.
     -   To address this issue, we limited the data loading process by reading a subset of the data. This would allow us to continue the development while staying within the memory constraint.
 -   **Filtering:** only keep the reviews where `verified_purchase == True`, and only the products that appear on both the `review` and `meta` dataset
