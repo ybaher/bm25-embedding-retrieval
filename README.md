@@ -30,56 +30,32 @@ This project uses a large-scale Amazon Reviews dataset collected by McAuley Lab 
 -   **Column combination:** we combined useful columns from `meta` into one single string for each product, including information of 'title', 'average_rating', 'description', 'features', 'categories', etc
 -   **For nested fields:** join lists into strings, concatenate key-value pairs of dictionary, handle missing strings by replacing with the empty string, etc.
 -   **Review aggregation:** The reviewed texts were grouped by `parent_asin` and merged into a single string per product. The new aggregated review information was later merged with the metadata so that both product details and user feedback are included in each document used for retrieval.
--   **Retrieval:** We implemented a custom retriever using `SentenceTransformer` and `FAISS` rather than using LangChain's HuggingFaceEmbeddings and vectorstore.as_retriever(). This was permitted by the spec for custom Python retriever implementations.
+-   **Retrieval:** We implemented a custom retriever using `SentenceTransformer` and `FAISS` rather than using LangChain's `HuggingFaceEmbeddings` and `vectorstore.as_retriever()`. This was permitted by the spec for custom Python retriever implementations.
 
 ## Retrieval workflows
 
 -   `BM25`
 
 1.  Preprocess the input query by tokenizing it
-
-    ↓
-
 2.  Calculate BM25 scores for every tokenized product
-
-    ↓
-
 3.  Order products by BM25 score from highest to lowest
-
-    ↓
-
 4.  Return top k results
 
 -   `Embedding Search`
 
 1.  Preprocess the input query using `SentenceTransformer`
-
-    ↓
-
 2.  Search FAISS index of embedded products by leveraging L2 distance
-
-    ↓
-
 3.  Order products using L2 distances from lowest to highest
-
-    ↓
-
 4.  Return top k results
 
 -   `Rag Pipeline`
 
-1.  User Query\
-    ↓
-2.  Retriever (`FAISS` + sentence embeddings)\
-    ↓
-3.  Top-k relevant products retrieved\
-    ↓
-4.  Context builder formats metadata and review evidence\
-    ↓
-5.  Prompt template adds instructions\
-    ↓
-6.  LLM (Groq Llama 3.1 8B)\
-    ↓
+1.  User Query
+2.  Retriever (`FAISS` + sentence embeddings)
+3.  Top-k relevant products retrieved
+4.  Context builder formats metadata and review evidence
+5.  Prompt template adds instructions
+6.  LLM (Groq Llama 3.1 8B)
 7.  Final answer
 
 ## API Setup
