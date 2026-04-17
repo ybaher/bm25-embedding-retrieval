@@ -11,6 +11,22 @@ Authors: Yasaman Baher, Jessie Liang
 ```{bash}
 conda env create -f environments.yml
 ```
+## Project Structure
+```
+├── app/
+│   └── app.py               # Dash web app with Search and RAG modes
+├── notebooks/
+│   └── milestone2_rag.ipynb # Exploratory notebook for RAG development
+├── results/
+│   └── milestone2_discussion.md  # Qualitative evaluation and findings
+├── src/
+│   ├── rag_pipeline.py      # Full RAG pipeline 
+│   ├── hybrid.py            # Hybrid retriever combining BM25 and FAISS
+│   └── prompts.py           # Prompt templates for the LLM
+├── data/                    # Processed Amazon Toys & Games dataset
+├── environments.yml         # Conda environment specification
+└── README.md
+```
 
 ## Dataset description
 
@@ -69,6 +85,25 @@ This project uses a large-scale Amazon Reviews dataset collected by McAuley Lab 
 7.  LLM (Groq Llama 3.1 8B)
 8.  Final answer
 
+## App Features
+
+### Search Mode (Milestone 1)
+- Select a retrieval method via radio button: **BM25**, **Semantic Search**, or **Hybrid**
+- Enter a natural language query in the text box and click **Retrieve**
+- View the top 5 results, where each shows:
+  - Product title
+  - Average rating
+  - Truncated review texts
+
+### RAG Mode (Milestone 2)
+- Switch to RAG mode using the tab at the top of the platform
+- Enter a query to run the full **Hybrid RAG pipeline**
+- A generated answer is shown above the given documents
+- Given source products are shown below the answer, each showing:
+  - Product title
+  - Average rating
+  - Truncated review text (~200 chars)
+
 ## API Setup
 
 This project uses Groq for the LLM.
@@ -126,3 +161,4 @@ Dash is running on http://127.0.0.1:8050/
 -   Copy the URL from the above output and open it in a browser. For example, load this URL `http://127.0.0.1:8050/`, and the app will be shown in the browser.
 -   Use the tab on the top bar to select a mode. In the first tab, use the radio button to select a retrieval method, and input a query in the text box
 -   Click `Retrieve`, done!
+
