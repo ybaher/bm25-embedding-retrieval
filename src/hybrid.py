@@ -231,6 +231,8 @@ if __name__ == "__main__":
         "A good board game for kids age 8 and up",
         "A toy for toddlers",
         "Educational toys for kids"
+        "A good gift for children who like biilding toys"
+        "A fun indoor activity toy for kids"
     ]
 
     for q in queries:

@@ -17,3 +17,13 @@ The Sorry! game is known to be hard for children under age 8 to handle due to th
 ### ===== prompt3 =====
 
 Based on the description of the Sorry! Board Game, it's recommended for kids ages 6 and up. However, it's mentioned that children under 8 may have a hard time handling the frustration of having their pawns sent back to the starting line. If you're looking for a board game suitable for kids age 8 and up, the Chinese Checkers game (Product ASIN: B08K7ST2ZT) might be a good option, as it's recommended for ages 7 and up.
+
+## Step 5: Qualitative Evaluation of Hybrid RAG
+
+| Query | Accuracy | Completeness | Fluency | Notes |
+|---------------|---------------|---------------|---------------|---------------|
+| A good board game for kids age 8 and up | Yes | Yes | Yes | The answer matched the retrieved context and gave a good and relevant recommendation with supporting reasons. |
+| A toy for toddlers | Yes | Yes | Yes | The answer had several toddler toys which was supported by the context, but it was more like a list than a single recommendation. |
+| Educational toys for kids | Yes | Yes | Yes | the response was supported by the retrieved context and provided a bunch of relevant educational toy options. |
+| A good gift for a child who likes building toys | Yes | Yes | Yes | The answer was able to find multiple building toy options from the context and explained why they fit the query. |
+| A fun indoor activity toy for kids | Yes | Yes | Yes | The answer that was chosen shows a clear relevance to the context and supports its with the details about imaginative play and indoor use. |
