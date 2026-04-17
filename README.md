@@ -124,5 +124,5 @@ Dash is running on http://127.0.0.1:8050/
 ```
 
 -   Copy the URL from the above output and open it in a browser. For example, load this URL `http://127.0.0.1:8050/`, and the app will be shown in the browser.
--   Use the radio button to select a retrieval method, and input a query in the text box
+-   Use the tab on the top bar to select a mode. In the first tab, use the radio button to select a retrieval method, and input a query in the text box
 -   Click `Retrieve`, done!
