@@ -48,7 +48,7 @@ This project uses a large-scale Amazon Reviews dataset collected by McAuley Lab 
 3.  Order products using L2 distances from lowest to highest
 4.  Return top k results
 
--   `Rag Pipeline`
+-   `Rag Pipeline` (Semantic)
 
 1.  User Query
 2.  Retriever (`FAISS` + sentence embeddings)
@@ -57,6 +57,17 @@ This project uses a large-scale Amazon Reviews dataset collected by McAuley Lab 
 5.  Prompt template adds instructions
 6.  LLM (Groq Llama 3.1 8B)
 7.  Final answer
+
+-   `Rag Pipeline` (Hybrid)
+
+1.  User Query
+2.  Two parallel retrievers: BM25 and Semantic
+3.  Results merged and deduplicated
+4.  Top-5 unique products passed forward
+5.  Context builder formats metadata and review evidence
+6.  Prompt template adds instructions
+7.  LLM (Groq Llama 3.1 8B)
+8.  Final answer
 
 ## API Setup
 
@@ -76,13 +87,21 @@ Windows: `setx GROQ_API_KEY <your given gsk key>`
 
 - Change the working directory to the root project directory
 - Make sure your `GROQ_API_KEY` is set (see API Setup above)
-- Run the following command in terminal:
+- Run the following command in terminal to test Milestone 2 Step 2:
 
 ```bash
 python src/rag_pipeline.py
 ```
 
+- Run the following command in terminal to test Milestone 2 Step 3:
+
+```bash
+python src/hybrid.py
+```
+
 - This will run the RAG pipeline with a set of sample queries and print the answers to the terminal.
+
+**Important note**: If you created API here `https://console.groq.com/keys` and used it, you might encounter an error if you send too many requests too fast, hitting the free tier limit of 6,000 tokens/minute. The error is a Groq rate limit — not a code bug. To resolve this error, just wait for a while and send requests again afterwards, giving it a cooldown period.
 
 ## How to run the app locally
 
