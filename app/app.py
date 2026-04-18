@@ -1,4 +1,11 @@
 # import libraries
+import sys
+import os
+
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+
 import pandas as pd
 import numpy as np
 from rank_bm25 import BM25Okapi
@@ -15,13 +22,11 @@ import faiss
 import dash
 from dash import dcc, html, Input, Output, State, Dash
 import dash_bootstrap_components as dbc
-import os
 import logging
 from transformers import logging as hf_logging
 from src.bm25 import bm25_search
 from src.semantic import embedding_search
 from src.simple_tokenize import simple_tokenize
-
 
 # suppress warnings
 os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
@@ -29,8 +34,8 @@ hf_logging.set_verbosity_error()
 logging.getLogger("werkzeug").setLevel(logging.ERROR)
 
 # Data loading & cleaning
-meta = pd.read_json("data/raw/meta_Toys_and_Games.jsonl", lines=True, nrows=10000)
-review = pd.read_json("data/raw/Toys_and_Games.jsonl", lines=True, nrows=10000)
+meta = pd.read_json("data/raw/meta_Toys_and_Games.jsonl", lines=True, nrows=50000)
+review = pd.read_json("data/raw/Toys_and_Games.jsonl", lines=True, nrows=50000)
 
 cleaned_meta = meta.drop(
     columns=["videos", "price", "images", "bought_together", "subtitle", "author"],

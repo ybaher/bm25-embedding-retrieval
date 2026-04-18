@@ -11,8 +11,10 @@ Authors: Yasaman Baher, Jessie Liang
 ```{bash}
 conda env create -f environments.yml
 ```
+
 ## Project Structure
-```
+
+```         
 ├── app/
 │   └── app.py               # Dash web app with Search and RAG modes
 ├── notebooks/
@@ -40,6 +42,7 @@ This project uses a large-scale Amazon Reviews dataset collected by McAuley Lab 
 
 -   **Size limit:** We limited the size of raw data files so that they only include 50,000 rows
     -   Note that our team tried to convert both `meta_Toys_and_Games.jsonl` and `Toys_and_Games.jsonl` from jsonl to parquet, however, due to the large size of the files, our local machines were not able to handle loading the full dataset into memory without slowing down or crashing.
+        -   After preprocessing, filtering verified purchases, and keeping overlapping products, the final pipeline processed 28,947 products.
     -   To address this issue, we limited the data loading process by reading a subset of the data. This would allow us to continue the development while staying within the memory constraint.
 -   **Filtering:** only keep the reviews where `verified_purchase == True`, and only the products that appear on both the `review` and `meta` dataset
 -   **Column selection:** drop 'videos', 'price', 'images', 'bought_together', 'subtitle', 'author' columns from `meta`, and drop 'images', 'timestamp', 'user_id', 'verified_purchase' from `review`
@@ -74,35 +77,42 @@ This project uses a large-scale Amazon Reviews dataset collected by McAuley Lab 
 6.  LLM (Groq Llama 3.1 8B)
 7.  Final answer
 
--   `Rag Pipeline` (Hybrid)
+## RAG Workflow Diagram
 
-1.  User Query
-2.  Two parallel retrievers: BM25 and Semantic
-3.  Results merged and deduplicated
-4.  Top-5 unique products passed forward
-5.  Context builder formats metadata and review evidence
-6.  Prompt template adds instructions
-7.  LLM (Groq Llama 3.1 8B)
-8.  Final answer
+``` mermaid
+flowchart TD
+    A[User Query] --> B[Retriever]
+    B --> C[Semantic Search FAISS]
+    B --> D[BM25 Search]
+    C --> E[Hybrid Retriever]
+    D --> E
+    E --> F[Top-k Retrieved Products]
+    F --> G[Context Builder]
+    G --> H[Prompt Template]
+    H --> I[LLM via Groq]
+    I --> J[Final Answer]
+```
 
 ## App Features
 
 ### Search Mode (Milestone 1)
-- Select a retrieval method via radio button: **BM25**, **Semantic Search**, or **Hybrid**
-- Enter a natural language query in the text box and click **Retrieve**
-- View the top 5 results, where each shows:
-  - Product title
-  - Average rating
-  - Truncated review texts
+
+-   Select a retrieval method via radio button: **BM25**, **Semantic Search**, or **Hybrid**
+-   Enter a natural language query in the text box and click **Retrieve**
+-   View the top 5 results, where each shows:
+    -   Product title
+    -   Average rating
+    -   Truncated review texts
 
 ### RAG Mode (Milestone 2)
-- Switch to RAG mode using the tab at the top of the platform
-- Enter a query to run the full **Hybrid RAG pipeline**
-- A generated answer is shown above the given documents
-- Given source products are shown below the answer, each showing:
-  - Product title
-  - Average rating
-  - Truncated review text (~200 chars)
+
+-   Switch to RAG mode using the tab at the top of the platform
+-   Enter a query to run the full **Hybrid RAG pipeline**
+-   A generated answer is shown above the given documents
+-   Given source products are shown below the answer, each showing:
+    -   Product title
+    -   Average rating
+    -   Truncated review text (\~200 chars)
 
 ## API Setup
 
@@ -120,31 +130,31 @@ Windows: `setx GROQ_API_KEY <your given gsk key>`
 
 ## How to run the RAG pipeline
 
-- Change the working directory to the root project directory
-- Make sure your `GROQ_API_KEY` is set (see API Setup above)
-- Run the following command in terminal to test Milestone 2 Step 2:
+-   Change the working directory to the root project directory
+-   Make sure your `GROQ_API_KEY` is set (see API Setup above)
+-   Run the following command in terminal to test Milestone 2 Step 2:
 
-```bash
+``` bash
 python src/rag_pipeline.py
 ```
 
-- Run the following command in terminal to test Milestone 2 Step 3:
+-   Run the following command in terminal to test Milestone 2 Step 3:
 
-```bash
+``` bash
 python src/hybrid.py
 ```
 
-- This will run the RAG pipeline with a set of sample queries and print the answers to the terminal.
+-   This will run the RAG pipeline with a set of sample queries and print the answers to the terminal.
 
 **Important note**: If you created API here `https://console.groq.com/keys` and used it, you might encounter an error if you send too many requests too fast, hitting the free tier limit of 6,000 tokens/minute. The error is a Groq rate limit — not a code bug. To resolve this error, just wait for a while and send requests again afterwards, giving it a cooldown period.
 
 ## How to run the app locally
 
 -   Change the working directory to the root project directory
--   Run the following command in terminal:
+-   Run from the project root directory:
 
 ``` bash
-python -m app.app
+python app/app.py 
 ```
 
 -   Then there will be some outputs in the terminal similar to this:
@@ -161,4 +171,3 @@ Dash is running on http://127.0.0.1:8050/
 -   Copy the URL from the above output and open it in a browser. For example, load this URL `http://127.0.0.1:8050/`, and the app will be shown in the browser.
 -   Use the tab on the top bar to select a mode. In the first tab, use the radio button to select a retrieval method, and input a query in the text box
 -   Click `Retrieve`, done!
-

@@ -230,8 +230,8 @@ if __name__ == "__main__":
     queries = [
         "A good board game for kids age 8 and up",
         "A toy for toddlers",
-        "Educational toys for kids"
-        "A good gift for children who like biilding toys"
+        "Educational toys for kids",
+        "A good gift for a child who likes building toys",
         "A fun indoor activity toy for kids"
     ]
 
