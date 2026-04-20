@@ -398,3 +398,27 @@ def retrieve(n_clicks, n_submit, query, search_mode, active_tab):
 
 if __name__ == "__main__":
     app.run(jupyter_mode="external")
+
+
+def get_bm25_top_k(bm25, products, query, top_k=5):
+    results = bm25_search(bm25, products, query, top_k=top_k)
+    return [text for text, _ in results]
+
+
+def get_semantic_top_k(model, index, products, query, top_k=5):
+    results = embedding_search(model, index, products, query, top_k=top_k)
+    return [text for text, _ in results]
+
+
+def get_hybrid_top_k(hybrid_retriever, rag_df, query, top_k=5):
+    docs = hybrid_retriever(query, top_k=top_k)
+    results = []
+    for doc in docs:
+        row_idx = doc.metadata.get("row_index")
+        row = rag_df.iloc[row_idx]
+        results.append({
+            "parent_asin": row["parent_asin"],
+            "title": row["title"],
+            "description": row["description"]
+        })
+    return results

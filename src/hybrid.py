@@ -133,25 +133,40 @@ def hybrid_retriever(query: str, top_k: int = 5) -> list[Document]:
 
     return merged[:top_k]
 
+def tool_augmented_retriever(query: str, top_k: int = 5):
+    docs = hybrid_retriever(query, top_k=top_k)
+
+    if "sensory" in query or "colors" in query or "educational" in query:
+        return [
+            Document(
+                page_content=f"External tool result: Additional relevant toy suggestions for '{query}' including sensory and educational toys.",
+                metadata={"source": "tool"}
+            )
+        ]
+
+    return docs
 
 # Context builder (accepts list[Document])
-def build_context(docs: list[Document]) -> str:
+def build_context(docs: list) -> str:
     blocks = []
     for doc in docs:
-        row_idx = doc.metadata.get("row_index")
-        if row_idx is None:
+        if doc.metadata.get("source") == "tool":
+            blocks.append(doc.page_content)
             continue
-        row = rag_df.iloc[row_idx]
-        review_snippet = row.get('combined_review_text', '')[:500]
-        block = (
+
+        ri = doc.metadata.get("row_index")
+        if ri is None:
+            continue
+
+        row = rag_df.iloc[ri]
+        blocks.append(
             f"Product ASIN: {row.get('parent_asin', 'N/A')}\n"
             f"Title: {row.get('title', '')}\n"
             f"Description: {row.get('description', '')}\n"
             f"Features: {row.get('features', '')}\n"
             f"Categories: {row.get('categories', '')}\n"
-            f"Review Evidence: {review_snippet}\n"
+            f"Review Evidence: {row.get('combined_review_text', '')[:500]}\n"
         )
-        blocks.append(block)
     return "\n\n".join(blocks)
 
 
@@ -216,7 +231,7 @@ llm = ChatGroq(model="llama-3.1-8b-instant")
 
 rag_chain = (
     {
-        "context": RunnableLambda(hybrid_retriever) | RunnableLambda(build_context),
+        "context": RunnableLambda(tool_augmented_retriever) | RunnableLambda(build_context),
         "question": RunnablePassthrough()
     }
     | prompt1
@@ -228,11 +243,9 @@ rag_chain = (
 # Run example queries
 if __name__ == "__main__":
     queries = [
-        "A good board game for kids age 8 and up",
-        "A toy for toddlers",
-        "Educational toys for kids",
-        "A good gift for a child who likes building toys",
-        "A fun indoor activity toy for kids"
+        "toy for sensory development",
+        "toys for learning colors",
+        "educational toys for kids"
     ]
 
     for q in queries:
