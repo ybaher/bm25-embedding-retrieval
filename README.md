@@ -30,6 +30,14 @@ conda env create -f environments.yml
 └── README.md
 ```
 
+## Usage Examples
+
+- Age-specific recommendations: Users can specify the minimum age requirement for products, such as "toys for kids at least 5 years old". Then the system will understand the semantic text of each product to filter for those satisfying the age requirement.
+
+- Find toys or games by developmental need: For example, users can ask for "educational games for kids", and the retriever will search all available products, returning the most relevant matches
+
+- Get the product with a particular product number/code: Keyword matching is enabled in this algorithm using BM25, which is good for extracting a particular product of interest.
+
 ## Dataset description
 
 This project uses a large-scale Amazon Reviews dataset collected by McAuley Lab in 2023. Among all 33 product categories, the category selected for this project was `Toys_and_Games`. The size of the data files can be as large as 800M+. There are 2 main component of the dataset: `review` and `meta`:
