@@ -136,4 +136,36 @@ Looking at both observations, we can see that they were both able to answer the 
 
 ### Final Choice
 
+Our final choice of model was `llama-3.1-8b-instant`. Although both models were able to perform well, the instant model provided more complete and reliable answers throughout the five given queries. The response of the selected model was better supported by the retrieved context and usually had a more clear justification for why a toy matched a query. Because the main focus of this assignment is accuracy when it comes to the use of context and clear answer quality, we chose `llama-3.1-8b-instant` as it was a stronger option for our pipeline.
+
 ## Step 2: Additional Feature — Tool Integration
+
+We chose to implement a tool-augmented retriever that extends our hybrid retrieval pipeline. When the query matches a word like 'colors' the system would fall back to an external tool that would provide an additional context, which is extremely useful for a model like this.
+
+### Query 1: "toy for sensory development"
+
+-   The tool was triggered and gave additional context about sensory and educational toys
+
+-   the mode was able to respond by showing that relevant suggestions exist but did not extract specific products
+
+-   Improvements: The tool was able to provide more information but the response was still limited due to the strict prompt constraints we provided.
+
+### Query 2: "toy for learning colors"
+
+-   The tool was activated to provide more information and context about the toys that teach kids about colors.
+
+-   The. model summarized the tool output directly.
+
+-   Imrpovements: the tool was able to improve the relevance of the context by focusing my on the toys specifically designed for learning colors.
+
+### Query 3: "educational toys for kids"
+
+-   The tool gave a general education toy suggestion
+
+-   The model returned a short and concise summary based on the given tool context.
+
+-   Improvement: The tool increased coverage by adding a more broader education toy options compared to before.
+
+### Conclusion
+
+Overall, the integrated tool was able to improve the system by giving additional context when retrieving results were weak, this helped the model generate more informed responses. It was also able to enhance the relevant information that were provided for abstract or specific queries given, where the initial retrieval alone might not have been sufficient enough. This was able to increase the overall coverage of the recommendations given by the model. The effectiveness, however, was limited due to the prompts given, which required the model to rely only on the provided context, which hindered and restricted the model's ability to fully leverage the added information in some cases.
