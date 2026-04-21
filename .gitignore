@@ -1,3 +1,6 @@
 data/raw/meta_Toys_and_Games.jsonl
 data/raw/Toys_and_Games.jsonl
 .env
+.vscode/
+__pycache__/
+.DS_Store
