@@ -136,6 +136,12 @@ Windows: `setx GROQ_API_KEY <your given gsk key>`
 
 3.  (Optional) verify: `echo $GROQ_API_KEY`
 
+4.  Create an `.env` file locally in the project root directory, with a single line:
+
+```{python}
+GROQ_API_KEY="your_API"
+```
+
 ## How to run the RAG pipeline
 
 -   Change the working directory to the root project directory
