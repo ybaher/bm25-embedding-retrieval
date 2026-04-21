@@ -7,11 +7,19 @@ from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 from langchain_community.retrievers import BM25Retriever
 from langchain_core.documents import Document
+from pathlib import Path
+import sys
 
 
 # Load data
-meta = pd.read_json("data/raw/meta_Toys_and_Games.jsonl", lines=True, nrows=50000)
-review = pd.read_json("data/raw/Toys_and_Games.jsonl", lines=True, nrows=50000)
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+META_FILE   = PROJECT_ROOT / "data" / "raw" / "meta_Toys_and_Games.jsonl"
+REVIEW_FILE = PROJECT_ROOT / "data" / "raw" / "Toys_and_Games.jsonl"
+
+meta = pd.read_json(META_FILE, lines=True, nrows=50000)
+review = pd.read_json(REVIEW_FILE, lines=True, nrows=50000)
 
 cleaned_meta = meta.drop(columns=['videos', 'price', 'images', 'bought_together', 'subtitle', 'author'], errors='ignore')
 
@@ -95,6 +103,8 @@ bm25_retriever = BM25Retriever.from_documents(lc_docs, k=5)
 
 # Semantic Retriever (FAISS-based, returns LangChain Documents)
 def semantic_retrieve(query: str, top_k: int = 5) -> list[Document]:
+    """Return the top-k semantically similar products 
+    as LangChain Documents using FAISS search."""
     query_embedding = embed_model.encode([query]).astype("float32")
     distances, indices = index.search(query_embedding, top_k)
     results = []
@@ -110,6 +120,8 @@ def semantic_retrieve(query: str, top_k: int = 5) -> list[Document]:
 
 # Hybrid Retriever: merge BM25 + semantic, deduplicate by row_index
 def hybrid_retriever(query: str, top_k: int = 5) -> list[Document]:
+    """Combine BM25 and semantic search results via interleaving 
+    to return the top-k deduplicated documents."""
     bm25_results = bm25_retriever.invoke(query)
     semantic_results = semantic_retrieve(query, top_k=top_k)
 
@@ -134,6 +146,8 @@ def hybrid_retriever(query: str, top_k: int = 5) -> list[Document]:
     return merged[:top_k]
 
 def tool_augmented_retriever(query: str, top_k: int = 5):
+    """Retrieve documents via hybrid search, injecting a tool-generated 
+    result for sensory or educational queries."""
     docs = hybrid_retriever(query, top_k=top_k)
 
     if "sensory" in query or "colors" in query or "educational" in query:
@@ -148,6 +162,7 @@ def tool_augmented_retriever(query: str, top_k: int = 5):
 
 # Context builder (accepts list[Document])
 def build_context(docs: list) -> str:
+    """Convert a list of retrieved Documents into a formatted context string for the LLM."""
     blocks = []
     for doc in docs:
         if doc.metadata.get("source") == "tool":

@@ -1,11 +1,7 @@
 # import libraries
 import sys
 import os
-
-PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
-
+from pathlib import Path
 import pandas as pd
 import numpy as np
 from rank_bm25 import BM25Okapi
@@ -28,14 +24,21 @@ from src.bm25 import bm25_search
 from src.semantic import embedding_search
 from src.simple_tokenize import simple_tokenize
 
+# specify file paths
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+META_FILE   = PROJECT_ROOT / "data" / "raw" / "meta_Toys_and_Games.jsonl"
+REVIEW_FILE = PROJECT_ROOT / "data" / "raw" / "Toys_and_Games.jsonl"
+
 # suppress warnings
 os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
 hf_logging.set_verbosity_error()
 logging.getLogger("werkzeug").setLevel(logging.ERROR)
 
 # Data loading & cleaning
-meta = pd.read_json("data/raw/meta_Toys_and_Games.jsonl", lines=True, nrows=50000)
-review = pd.read_json("data/raw/Toys_and_Games.jsonl", lines=True, nrows=50000)
+meta = pd.read_json(META_FILE, lines=True, nrows=50000)
+review = pd.read_json(REVIEW_FILE, lines=True, nrows=50000)
 
 cleaned_meta = meta.drop(
     columns=["videos", "price", "images", "bought_together", "subtitle", "author"],
@@ -119,6 +122,8 @@ bm25_retriever = BM25Retriever.from_documents(lc_docs, k=5)
 
 
 def semantic_retrieve(query: str, top_k: int = 5) -> list:
+    """Encode a query and return the top-k semantically matched 
+    RAG products as LangChain Documents."""
     q_emb = model.encode([query]).astype("float32")
     _, indices = rag_index.search(q_emb, top_k)
     return [
@@ -128,6 +133,8 @@ def semantic_retrieve(query: str, top_k: int = 5) -> list:
 
 
 def hybrid_retriever(query: str, top_k: int = 5) -> list:
+    """Merge and deduplicate BM25 and semantic search results 
+    by interleaving to return the top-k documents."""
     bm25_res = bm25_retriever.invoke(query)
     sem_res = semantic_retrieve(query, top_k=top_k)
     seen, merged = set(), []
@@ -146,6 +153,7 @@ def hybrid_retriever(query: str, top_k: int = 5) -> list:
 
 
 def build_context(docs: list) -> str:
+    """Format a list of retrieved Documents into a structured product context string for the LLM."""
     blocks = []
     for doc in docs:
         ri = doc.metadata.get("row_index")
@@ -281,6 +289,9 @@ def toggle_model_selector(tab):
     prevent_initial_call=True,
 )
 def retrieve(n_clicks, n_submit, query, search_mode, active_tab):
+    """Handle search and RAG mode queries, returning ranked product cards 
+    or an LLM-generated answer with sources."""
+    
     if not query or not query.strip():
         return dbc.Alert("Please enter a search query.", color="warning")
 
@@ -401,16 +412,20 @@ if __name__ == "__main__":
 
 
 def get_bm25_top_k(bm25, products, query, top_k=5):
+    """Return the top-k product texts ranked by BM25 score for a given query."""
     results = bm25_search(bm25, products, query, top_k=top_k)
     return [text for text, _ in results]
 
 
 def get_semantic_top_k(model, index, products, query, top_k=5):
+    """Return the top-k product texts ranked by semantic similarity for a given query."""
     results = embedding_search(model, index, products, query, top_k=top_k)
     return [text for text, _ in results]
 
 
 def get_hybrid_top_k(hybrid_retriever, rag_df, query, top_k=5):
+    """Return the top-k products as dictionaries of key fields 
+    using hybrid BM25 and semantic retrieval."""
     docs = hybrid_retriever(query, top_k=top_k)
     results = []
     for doc in docs:
