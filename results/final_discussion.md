@@ -136,6 +136,7 @@ Looking at both observations, we can see that they were both able to answer the 
 
 ### Final Choice
 
+<<<<<<< HEAD
 Our final choice of model was `llama-3.1-8b-instant`. Although both models were able to perform well, the instant model provided more complete and reliable answers throughout the five given queries. The response of the selected model was better supported by the retrieved context and usually had a more clear justification for why a toy matched a query. Because the main focus of this assignment is accuracy when it comes to the use of context and clear answer quality, we chose `llama-3.1-8b-instant` as it was a stronger option for our pipeline.
 
 ## Step 2: Additional Feature — Tool Integration
@@ -169,3 +170,62 @@ We chose to implement a tool-augmented retriever that extends our hybrid retriev
 ### Conclusion
 
 Overall, the integrated tool was able to improve the system by giving additional context when retrieving results were weak, this helped the model generate more informed responses. It was also able to enhance the relevant information that were provided for abstract or specific queries given, where the initial retrieval alone might not have been sufficient enough. This was able to increase the overall coverage of the recommendations given by the model. The effectiveness, however, was limited due to the prompts given, which required the model to rely only on the provided context, which hindered and restricted the model's ability to fully leverage the added information in some cases.
+=======
+## Step 2: Additional Feature — Tool Integration
+
+## Step 3: Improve Documentation and Code Quality
+
+### Documentation Update
+
+- Summary of `README` improvements compared to Milestone 2
+
+1. Changed the command to run the app to `python -m app.app`
+
+2. Added an instruction to create `.env` locally under the **API Setup** section
+
+3. Described new features added
+
+### Code Quality Changes
+
+- Summary of cleanups
+
+1. Used `pathlib.Path` to replace hardcoded file paths
+
+2. Initially, there was no API key in source code, so no change to this
+
+3. Added an one-line docstring to every function in notebooks and Python files
+
+4. Made sure `environment.yml` is most up-to-date
+
+5. Removed garbage files from the repo such as `.DS_Store`, `__pycache__/`, `.vscode/`, etc
+
+6. Added more items to `.gitignore`
+
+## Step 4: Cloud Deployment Plan
+
+I am planning to deploy it using AWS.
+
+1. Data Storage: Where will you store the following?
+
+- raw data: The raw data file (of large size) will be stored in AWS S3 due to its scalibility to store large data.
+
+- processed data: Also stored in AWS S3.
+
+- vector index: Also stored in AWS S3, then loaded to memory to support EC2 running.
+
+- BM25 index: Also stored in AWS S3.
+
+2. Compute
+
+- Where will your app run: The app will run on EC2, which has scalable computational resources, ensuring good performance.
+
+- How will you handle multiple users (concurrency): Multiple users will be handled by a load balancer, which allocates multiple concurrent requests to different app instances, scaling automatically.
+
+- How will you handle LLM inference (API vs hosted model): I will still use external API instead of hosted model.
+
+3. Streaming/Updates
+
+- How will you incorporate new products in production: We can run a scheduled ETL process under AWS Glue on a daily basis. ETL can also be run on demand if the task is time sensitive. In this way, new products/data will be injected into our current S3 files, which will be reflected in the app.
+
+- How will your pipeline stay up to date: We can setup a trigger connected to a lambda function, which will be triggered to run whenever there is an update of the data/files/etc, in an automatic way. So, the pipeline will be updated nearly real-time.
+>>>>>>> b2d109e118e390ea754ab9f00d555b4a1fced1ac

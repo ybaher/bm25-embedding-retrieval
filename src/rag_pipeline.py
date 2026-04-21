@@ -5,12 +5,20 @@ import faiss
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
+from pathlib import Path
+import sys
 
 # -------------------------
 # Load data
 # -------------------------
-meta = pd.read_json("data/raw/meta_Toys_and_Games.jsonl", lines=True, nrows=50000)
-review = pd.read_json("data/raw/Toys_and_Games.jsonl", lines=True, nrows=50000)
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+META_FILE   = PROJECT_ROOT / "data" / "raw" / "meta_Toys_and_Games.jsonl"
+REVIEW_FILE = PROJECT_ROOT / "data" / "raw" / "Toys_and_Games.jsonl"
+
+meta = pd.read_json(META_FILE, lines=True, nrows=50000)
+review = pd.read_json(REVIEW_FILE, lines=True, nrows=50000)
 
 cleaned_meta = meta.drop(columns=['videos', 'price', 'images', 'bought_together', 'subtitle', 'author'], errors='ignore')
 cleaned_meta.head()
@@ -89,6 +97,8 @@ index.add(product_embeddings)
 # -------------------------
 
 def retrieve(query, top_k=5):
+    """Retrieve the top-k most semantically similar products 
+    from the RAG dataframe for a given query."""
     query_embedding = model.encode([query]).astype("float32")
     distances, indices = index.search(query_embedding, top_k)
     return rag_df.iloc[indices[0]]
@@ -98,6 +108,7 @@ def retrieve(query, top_k=5):
 # -------------------------
 # Implemented with the help of chatGPT
 def build_context(docs):
+    """Format retrieved product rows into a structured text context string for the LLM."""
     blocks = []
     for _, row in docs.iterrows():
         review_snippet = row.get('combined_review_text', '')[:500]
@@ -118,6 +129,7 @@ def build_context(docs):
 # Wrapper function
 # -------------------------
 def retrieve_and_build_context(query):
+    """Call the previous retrieve function and build_context function sequentially"""
     docs = retrieve(query, top_k=5)
     return build_context(docs)
 

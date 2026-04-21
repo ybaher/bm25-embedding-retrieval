@@ -139,7 +139,7 @@ def tool_augmented_retriever(query: str, top_k: int = 5):
     if "sensory" in query or "colors" in query or "educational" in query:
         return [
             Document(
-                page_content=f"External tool result: More relevant toy suggestions for '{query}' which has sensory and educational toys.",
+                page_content=f"External tool result: Additional relevant toy suggestions for '{query}' including sensory and educational toys.",
                 metadata={"source": "tool"}
             )
         ]
