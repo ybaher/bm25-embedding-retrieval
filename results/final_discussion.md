@@ -165,3 +165,31 @@ Looking at both observations, we can see that they were both able to answer the 
 5. Removed garbage files from the repo such as `.DS_Store`, `__pycache__/`, `.vscode/`, etc
 
 6. Added more items to `.gitignore`
+
+## Step 4: Cloud Deployment Plan
+
+I am planning to deploy it using AWS.
+
+1. Data Storage: Where will you store the following?
+
+- raw data: The raw data file (of large size) will be stored in AWS S3 due to its scalibility to store large data.
+
+- processed data: Also stored in AWS S3.
+
+- vector index: Also stored in AWS S3, then loaded to memory to support EC2 running.
+
+- BM25 index: Also stored in AWS S3.
+
+2. Compute
+
+- Where will your app run: The app will run on EC2, which has scalable computational resources, ensuring good performance.
+
+- How will you handle multiple users (concurrency): Multiple users will be handled by a load balancer, which allocates multiple concurrent requests to different app instances, scaling automatically.
+
+- How will you handle LLM inference (API vs hosted model): I will still use external API instead of hosted model.
+
+3. Streaming/Updates
+
+- How will you incorporate new products in production: We can run a scheduled ETL process under AWS Glue on a daily basis. ETL can also be run on demand if the task is time sensitive. In this way, new products/data will be injected into our current S3 files, which will be reflected in the app.
+
+- How will your pipeline stay up to date: We can setup a trigger connected to a lambda function, which will be triggered to run whenever there is an update of the data/files/etc, in an automatic way. So, the pipeline will be updated nearly real-time.
