@@ -137,3 +137,31 @@ Looking at both observations, we can see that they were both able to answer the 
 ### Final Choice
 
 ## Step 2: Additional Feature — Tool Integration
+
+## Step 3: Improve Documentation and Code Quality
+
+### Documentation Update
+
+- Summary of `README` improvements compared to Milestone 2
+
+1. Changed the command to run the app to `python -m app.app`
+
+2. Added an instruction to create `.env` locally under the **API Setup** section
+
+3. Described new features added
+
+### Code Quality Changes
+
+- Summary of cleanups
+
+1. Used `pathlib.Path` to replace hardcoded file paths
+
+2. Initially, there was no API key in source code, so no change to this
+
+3. Added an one-line docstring to every function in notebooks and Python files
+
+4. Made sure `environment.yml` is most up-to-date
+
+5. Removed garbage files from the repo such as `.DS_Store`, `__pycache__/`, `.vscode/`, etc
+
+6. Added more items to `.gitignore`
