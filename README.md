@@ -162,7 +162,7 @@ python src/hybrid.py
 -   Run from the project root directory:
 
 ``` bash
-python app/app.py 
+python -m app.app 
 ```
 
 -   Then there will be some outputs in the terminal similar to this:
