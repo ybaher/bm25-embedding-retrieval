@@ -18,16 +18,24 @@ conda env create -f environments.yml
 ├── app/
 │   └── app.py               # Dash web app with Search and RAG modes
 ├── notebooks/
+│   └── milestone1_exploration.ipynb    # BM25 and Semantic retriever
 │   └── milestone2_rag.ipynb # Exploratory notebook for RAG development
-├── results/
-│   └── milestone2_discussion.md  # Qualitative evaluation and findings
+├── results/                 # Qualitative evaluation and findings
+│   └── milestone1_discussion.md    
+│   └── milestone2_discussion.md    
+│   └── final_discussion.md    
 ├── src/
+│   ├── bm25.py              # BM25 retriever function
+│   ├── semantic.py          # Semantic retriever function
+│   ├── simple_tokenize.py   # Tokenization function
 │   ├── rag_pipeline.py      # Full RAG pipeline 
 │   ├── hybrid.py            # Hybrid retriever combining BM25 and FAISS
-│   └── prompts.py           # Prompt templates for the LLM
-├── data/                    # Processed Amazon Toys & Games dataset
+├── data/                    
+│   └── raw/                 # Place to store raw data files
+│   └── processed/           # Processed Amazon Toys & Games dataset
 ├── environments.yml         # Conda environment specification
 └── README.md
+└── .gitignore
 ```
 
 ## Usage Examples
