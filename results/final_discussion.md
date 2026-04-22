@@ -224,4 +224,4 @@ I am planning to deploy it using AWS.
 
 -   How will you incorporate new products in production: We can run a scheduled ETL process under AWS Glue on a daily basis. ETL can also be run on demand if the task is time sensitive. In this way, new products/data will be injected into our current S3 files, which will be reflected in the app.
 
--   How will your pipeline stay up to date: We can setup a trigger connected to a lambda function, which will be triggered to run whenever there is an update of the data/files/etc, in an automatic way. So, the pipeline will be updated nearly real-time. \>\>\>\>\>\>\> b2d109e118e390ea754ab9f00d555b4a1fced1ac
+-   How will your pipeline stay up to date: We can setup a trigger connected to a lambda function, which will be triggered to run whenever there is an update of the data/files/etc, in an automatic way. So, the pipeline will be updated nearly real-time.
