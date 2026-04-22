@@ -38,6 +38,12 @@ conda env create -f environments.yml
 
 - Get the product with a particular product number/code: Keyword matching is enabled in this algorithm using BM25, which is good for extracting a particular product of interest.
 
+## New feature in final submission
+
+- Feature: We chose to implement a tool-augmented retriever that extends our hybrid retrieval pipeline. When the query matches a word such as 'colors' the system would fall back to an external tool that would provide an additional context.
+
+- Effect: Overall, the integrated tool was able to improve the system by giving additional context when retrieving results were weak, this helped the model generate more informed responses. It was also able to enhance the relevant information that were provided for abstract or specific queries given, where the initial retrieval alone might not have been sufficient enough.
+
 ## Dataset description
 
 This project uses a large-scale Amazon Reviews dataset collected by McAuley Lab in 2023. Among all 33 product categories, the category selected for this project was `Toys_and_Games`. The size of the data files can be as large as 800M+. There are 2 main component of the dataset: `review` and `meta`:
