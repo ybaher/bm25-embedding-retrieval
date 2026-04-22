@@ -85,6 +85,17 @@ This project uses a large-scale Amazon Reviews dataset collected by McAuley Lab 
 6.  LLM (Groq Llama 3.1 8B)
 7.  Final answer
 
+-   `Rag Pipeline` (Hybrid)
+
+1.  User Query
+2.  Two parallel retrievers: BM25 and Semantic
+3.  Results merged and deduplicated
+4.  Top-5 unique products passed forward
+5.  Context builder formats metadata and review evidence
+6.  Prompt template adds instructions
+7.  LLM (Groq Llama 3.1 8B)
+8.  Final answer
+
 ## RAG Workflow Diagram
 
 ``` mermaid
